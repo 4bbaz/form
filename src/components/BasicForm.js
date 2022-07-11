@@ -4,49 +4,50 @@ import { useFormik } from "formik";
 import Axios from "axios";
 
 const BasicForm = () => {
-  const [listOfUsers, setListOfUsers] = useState([
-    // {
-    //   email: "test@gamil.com",
-    //   age: "21",
-    //   password: "test",
-    //   confirmPassword: "test",
-    // },
-  ]);
+  const [listOfUsers, setListOfUsers] = useState([]);
 
-  // useEffect(()=>{
-  //   Axios.get('http://localhost:5001/getUsers')
-  // .then(function (response) {
-  //   // handle success
-  //   console.log(response);
-  // })
-  // })
+  // const [email, setEmail] = useState("");
+  // const [age, setAge] = useState(0);
+  // const [password, setPassword] = useState("");
+  // const [confirmPassword, setConfirmPassword] = useState("");
 
-  useEffect (()=>{
-    Axios.get("http://localhost:5001/getUsers").then((response)=>{
-      setListOfUsers(response.data)
+
+
+  useEffect(() => {
+    Axios.get("http://localhost:5001/getUsers").then((response) => {
+      setListOfUsers(response.data);
     });
-  },[])
+  }, []);
 
-  const onSubmit = () => {
-    console.log("submitted");
+  const createUser = () => {
+    Axios.post("http://localhost:5001/createUsers", {
+      email:values.email,
+      age:values.age,
+      password:values.password,
+      confirmPassword:values.confirmPassword,
+    }).then((response) => {
+      setListOfUsers([...listOfUsers, this.email, this.age, this.password, this.confirmPassword]);
+    });
   };
 
   const { values, errors, touched, handleChange, handleBlur, handleSubmit } =
     useFormik({
       initialValues: {
         email: "",
-        äge: "",
+        age: "",
         password: "",
-        confrimPassword: "",
+        confirmPassword: "",
       },
       validationSchema: basicSchema,
-      onSubmit,
+      onSubmit: () => {
+        createUser();
+      },
     });
 
   console.log(errors);
   return (
     <>
-      <form autoComplete="off" onSubmit={handleSubmit}>
+      <form autoComplete="off" onSubmit={createUser}>
         <label htmlFor="email">Email</label>
         <input
           value={values.email}
@@ -86,21 +87,25 @@ const BasicForm = () => {
         )}
         <label htmlFor="email">Confrim Password</label>
         <input
-          value={values.confrimPassword}
+          value={values.confirmPassword}
           onChange={handleChange}
-          id="ConfrimPassword"
+          id="confirmPassword"
           type="password"
           placeholder="Enter your confrim password"
           onBlur={handleBlur}
           className={
-            errors.confrimPassword && touched.confrimPassword
+            errors.confirmPassword && touched.confirmPassword
               ? "input-error"
               : ""
           }
         />
-        {errors.confrimPassword && touched.confrimPassword && (
-          <p className="error">{errors.confrimPassword}</p>
+        {errors.confirmPassword && touched.confirmPassword && (
+          <p className="error">{errors.confirmPassword}</p>
         )}
+
+        <button type="submit">
+          Submit
+        </button>
       </form>
       <div className="usersDisplay">
         {listOfUsers.map((user) => {
